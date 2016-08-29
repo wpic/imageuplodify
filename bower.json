@@ -1,0 +1,25 @@
+{
+  "name": "imageuplodify",
+  "authors": [
+    "juliette.tran@wpic.co <Juliette-Angélique TRAN>",
+    "hamed@wpic.co <Hamed Abdollahpour>"
+  ],
+  "description": "Simple JQuery-Boostrap image input, support drag and drop",
+  "main": "imageuplodify.js",
+  "keywords": [
+    "jquery",
+    "boostrap",
+    "upload",
+    "image",
+    "drag&drop"
+  ],
+  "license": "GPL2.0",
+  "homepage": "http://wpic-tools.com",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
