@@ -32,54 +32,60 @@
     // Override default option with user's if exist.
     var settings = $.extend( {}, $.fn.imageuplodify.defaults, opts);
     var self = this;
-
-    /* TEST */
-    function drag(event) {
-      event.dataTransfer.setData("text", event.target.id);
-    }
-
-    function previewFile(input) {
-      if (input.files && input.files[0]) {
-        var fReader = new FileReader();
-        reader.onload = function(e) {
-          // Disable the writing span...
-          // Create element with the image and append it to the code.
-        }
-      }
-    }
-
-    var dragbox = $("<div><i class='glyphicon glyphicon-plus'></i><span>Drag your file(s) here...</span></div>");
-    var icon = dragbox.children("i");
-    var span = dragbox.children("span");
+    var thumbnails = [];
 
     /*
+      
+
+
+    */
+
+    var dragbox = $("<div class='ctn'><i class='glyphicon glyphicon-plus add'></i><div class='img'><span>Drag your file(s) here...</span></div></div>");
+    var icon = dragbox.find("i");
+    var span = dragbox.find("span");
+
+
     icon.on("click", function onClick(event) {
-      console.log("Click icon");
       $(self).click();
     });
-    */
-   
+
+    const readingFile = (file) => {
+
+      var fReader = new FileReader();
+
+      fReader.onloadend = function (e) {
+        var image = $("<div class='crop'><img><div>");
+        image.find("img").attr("src", e.target.result);
+        thumbnails.push(image);
+        dragbox.find("span").hide();
+        dragbox.find(".img").append(image);
+      };
+      fReader.readAsDataURL(file);
+    };
+
     dragbox.on("drop", function onDrop(event) {
-      console.log("plop");  
+      console.log("Drop event");
       event.stopPropagation();
       event.preventDefault();
       var files = event.originalEvent.dataTransfer.files; // || event.originalEvent.target.files;
-      var thumbnails = [];
-      var fReader = new FileReader();
-      fReader.onload = function (e) {
-        var image = $("<img height='100' width='100'>");
-        image.attr("src", e.target.result);
-        thumbnails.push(image);
-      };
-
-      for(var index = 0; index <= files.length; ++index) {
-        fReader.readAsDataURL(file);
+      
+      for(var index = 0; index < files.length; ++index) {
+        readingFile(files[index]);
       }
-
-      dragbox.children("span").replaceWith(thumbnails);
     });
 
-    this.replaceWith(dragbox);
+
+    self.on("change", function() {
+      console.log("Change event");
+      var files = this.files;
+
+      for(var index = 0; index < files.length; ++index) {
+        readingFile(files[index]);
+      }
+    });
+
+    this.hide();
+    dragbox.insertAfter(this);
 
     /* END TEST */
 

@@ -10,12 +10,74 @@
         
         <style type="text/css">
 
-        .container div {
-            border: medium dashed;
-            height: 350px;
-            text-align: center;
-            width: 500px;
-        }
+            .container div.ctn {
+                border: 2px dashed;
+                min-height: 350px;
+                text-align: center;
+                width: 500px;
+                display:flex;
+                flex-direction: column;
+                justify-content: center;
+                background-color: rgba(242, 242, 242, 0.7);
+            }
+
+            i {
+                display: block !important;
+                font-size: 3em;
+                text-align: center;
+                margin-top: 1em;
+            }
+            .img {
+                display: inline-block;
+                padding: 1em 0;
+            }
+
+            div.crop {
+                width: 100px;
+                height: 100px;
+                position: relative;
+                overflow: hidden;
+                margin-left: 1em;
+                margin-bottom: 1em;
+                float: left;
+
+                border-radius: 1em;
+            }
+           
+            .img div:nth-child(4n+1) {
+                margin-right: 1.5em;
+            }
+            .img div:nth-child(4n+2) {
+                margin-left: 1.5em;
+            }
+
+            img {
+                height: 100%;
+                left: 50%;
+                position: absolute;
+                top: 50%;
+                transform: translate(-50%, -50%);
+                width: auto;
+            }
+            
+            /* SECOND STYLE */
+
+            /*
+            .add {
+                border: 2px dashed;
+                border-radius: 10px;
+                height: 100px;
+                width: 100px;
+            }
+
+            .glyphicon-plus::before {
+                position: absolute;
+                left: 50%;
+                top: 50%;
+                transform: translate(-50%, -50%);
+                float: left;
+            }
+            */
 
         </style>
 
@@ -25,7 +87,7 @@
 
         <div class="container" style="margin-top: 1em;">
             <form>
-                <input type="file">
+                <input type="file" multiple>
             </form>
         </div>
 
