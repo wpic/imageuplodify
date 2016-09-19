@@ -10,6 +10,7 @@
 // To be sure that undefined is truly undefined (For ES3)
 ;(function($, window, document, undefined) {
  
+  // Prevent issues about browser opening file by drop.
   window.addEventListener("dragover",function(e){
     e = e || event;
     e.preventDefault();
@@ -21,16 +22,17 @@
   },false);
 
   // Define the plugin.
-  $.fn.imageuplodify = function(opts) {
+  $.fn.imageuploadify = function(opts) {
 
     // Override default option with user's if exist.
-    const settings = $.extend( {}, $.fn.imageuplodify.defaults, opts);
+    const settings = $.extend( {}, $.fn.imageuploadify.defaults, opts);
 
     // Initialize every element.
     this.each(function() {
-
+      // Save the current element to self to avoid conflict.
       const self = this;
 
+      // Define the dragbox layout.
       let dragbox = $(`
       <div class="well">
         <div class="overlay">
@@ -43,6 +45,7 @@
       </div>
       `);
 
+      // Save all elements of the dragbox.
       let overlay = dragbox.find(".overlay");
       let uploadIcon = dragbox.find(".overlay span i");
       let uploadMsg = dragbox.find(".overlay span");
@@ -75,7 +78,6 @@
       overlay.css("text-align", "center");
 
       // Uploading message CSS
-      // uploadMsg.css("background-color", "rgba(30, 30, 30, 0.5)");
       uploadMsg.css("height", "100px");
       uploadMsg.css("margin", "auto");
       uploadMsg.css("padding-top", "29px");
@@ -93,41 +95,73 @@
       addIcon.css("padding-bottom", "20px");
 
 
+      // Define the function to read a file.
       const readingFile = (file) => {
 
-        var fReader = new FileReader();
+        const fReader = new FileReader();
 
-        // Associated function to a ending load
-        fReader.onloadend = function (e) {
-          var imageCtn = $("<div><img><div>");
-          var image = imageCtn.find("img");
+        let container = $("<div></div>");
 
-          // Image container CSS
-          imageCtn.css("width", "100px");
-          imageCtn.css("height", "100px");
-          imageCtn.css("position", "relative");
-          imageCtn.css("overflow", "hidden");
-          imageCtn.css("margin-left", "1em");
-          imageCtn.css("margin-bottom", "1em");
-          imageCtn.css("float", "left");
-          imageCtn.css("border-radius", "1em");
+        container.css("width", "100px");
+        container.css("height", "100px");
+        container.css("position", "relative");
+        container.css("overflow", "hidden");
+        container.css("margin-left", "1em");
+        container.css("margin-bottom", "1em");
+        container.css("float", "left");
+        container.css("border-radius", "1em");
+        container.css("box-shadow", "5px 5px 5px #888888");
 
-          // Image CSS
-          image.css("height", "100px");
-          image.css("left", "50%");
-          image.css("position", "absolute");
-          image.css("top", "50%");
-          image.css("transform", "translate(-50%, -50%)");
-          image.css("width", "auto");
-          image.css("border", "inset 0px 0px 40px 40px rgba(186, 235, 245, 1)");
 
-          image.attr("src", e.target.result);
-          addMsg.hide();
-          imagesList.append(imageCtn);
 
-          imagesList.find(":nth-child(4n+3)").css("margin-left", "1.7em"); 
-          imagesList.find(":nth-child(4n+6)").css("margin-right", "1.7em");
-        };
+        if (file.type && file.type.search(/image/) != -1) {
+          console.log("Still image");
+
+          // Associated function to a ending load
+          fReader.onloadend = function (e) {
+            var image = $("<img>");
+
+            // Image CSS
+            image.css("height", "100px");
+            image.css("left", "50%");
+            image.css("position", "absolute");
+            image.css("top", "50%");
+            image.css("transform", "translate(-50%, -50%)");
+            image.css("width", "auto");
+            image.css("border", "inset 0px 0px 40px 40px rgba(186, 235, 245, 1)");
+
+            // Paste the image source to display the image preview.
+            image.attr("src", e.target.result);
+            container.append(image);
+            addMsg.hide();
+            imagesList.append(container);
+
+            imagesList.find(":nth-child(4n+3)").css("margin-left", "1.7em"); 
+            imagesList.find(":nth-child(4n+6)").css("margin-right", "1.7em");
+          };
+
+        }
+        else if (file.type) {
+          console.log("NOT image");
+
+          // Associated function to a ending load
+          fReader.onloadend = function (e) {
+            let span = $("<span>" + file.name + "</span>");
+
+
+
+            container.css("border", "1px solid black");
+            container.css("font-size", "12px");
+
+            container.append(span);
+            addMsg.hide();
+            imagesList.append(container);
+
+            imagesList.find(":nth-child(4n+3)").css("margin-left", "1.7em"); 
+            imagesList.find(":nth-child(4n+6)").css("margin-right", "1.7em");
+          };
+        }
+
 
         fReader.readAsDataURL(file);
       };
@@ -137,27 +171,29 @@
         $(self).click();
       });
 
-      dragbox.on("dragenter", function onDrop(event) {
+      // Manage events to display an overlay when dragover files.
+      dragbox.on("dragenter", function onDragenter(event) {
         event.stopPropagation();
         event.preventDefault();
 
         overlay.css("display", "flex");
       });
-
-      dragbox.on("dragexit", function onDrop(event) {
+      
+      dragbox.on("dragexit", function onDragexit(event) {
         event.stopPropagation();
         event.preventDefault();
 
         overlay.css("display", "none");
       });
 
-      dragbox.on("dragleave", function onDrop(event) {
+      dragbox.on("dragleave", function onDragleave(event) {
         event.stopPropagation();
         event.preventDefault();
 
         overlay.css("display", "none");
       });
 
+      // Manage events when dropping files.
       dragbox.on("drop", function onDrop(event) {
         event.stopPropagation();
         event.preventDefault();
@@ -172,8 +208,7 @@
         }
       });
 
-
-      $(self).on("change", function() {
+      $(self).on("change", function onChange() {
         var files = this.files;
 
         for(var index = 0; index < files.length; ++index) {
@@ -192,7 +227,7 @@
 
 
   // Default configuraiton of the plugin.
-  $.fn.imageuplodify.defaults = {
+  $.fn.imageuploadify.defaults = {
 
   };
 
