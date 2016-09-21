@@ -5,6 +5,13 @@ A simple plugin [jQuery](http://jquery.com/) to convert file (images) input to d
 
 ![imageuploadify screenshot](screenshot.png)
 
+Dependencies
+============
+
+* [jQuery](http://jquery.com/)
+* [Bootstrap](http://getbootstrap.com/)
+* [Font Awesome](http://fontawesome.io/)
+
 Usage
 =====
 

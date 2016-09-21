@@ -11,15 +11,15 @@
 ;(function($, window, document, undefined) {
  
   // Prevent issues about browser opening file by drop.
-  window.addEventListener("dragover",function(e){
+  window.addEventListener("dragover", function(e) {
     e = e || event;
     e.preventDefault();
-  },false);
+  }, false);
 
-  window.addEventListener("drop",function(e){
+  window.addEventListener("drop", function(e) {
     e = e || event;
     e.preventDefault();
-  },false);
+  }, false);
 
   // Define the plugin.
   $.fn.imageuploadify = function(opts) {
@@ -32,27 +32,30 @@
       // Save the current element to self to avoid conflict.
       const self = this;
 
+      console.log(self);
+
       // Define the dragbox layout.
       let dragbox = $(`
       <div class="well">
         <div class="overlay">
-          <span class="panel panel-default"><i class="glyphicon glyphicon-cloud-upload"></i> Drop to upload</span>
+        <i class="fa fa-picture-o"></i>
         </div>
         <div class="images-list text-center">
-          <i class="glyphicon glyphicon-plus"></i>
-          <span>Drag your file(s) here...</span>
+          <i class="fa fa-cloud-upload"></i>
+          <span>Drag & Drop Your File(s) Here To Upload</span>
+          <button class="btn btn-default">or select file to upload</button>
         </div>
       </div>
       `);
 
       // Save all elements of the dragbox.
       let overlay = dragbox.find(".overlay");
-      let uploadIcon = dragbox.find(".overlay span i");
-      let uploadMsg = dragbox.find(".overlay span");
+      let uploadIcon = dragbox.find(".overlay i");
 
       let imagesList = dragbox.find(".images-list");
       let addIcon = dragbox.find(".images-list i");
       let addMsg = dragbox.find(".images-list span");
+      let button = dragbox.find(".images-list button");
 
       // Dropbox CSS
       dragbox.css("border", "2px dashed rgb(210, 210, 210)");
@@ -64,9 +67,10 @@
       dragbox.css("flex-direction", "column");
       dragbox.css("text-align", "center");
       dragbox.css("background-color", "white");
+      dragbox.css("color", "#3AA0FF");
 
       // Overlay CSS
-      overlay.css("z-index", "10000");
+      overlay.css("z-index", "10");
       overlay.css("width", "100%");
       overlay.css("height", "100%");
       overlay.css("position", "absolute");
@@ -74,32 +78,43 @@
       overlay.css("top", "0");
       overlay.css("left", "0");
       overlay.css("display", "none");
+      overlay.css("font-size", "7em");
       overlay.css("background-color", "rgba(242, 242, 242, 0.7)");
       overlay.css("text-align", "center");
+      overlay.css("pointer-events", "none");
 
-      // Uploading message CSS
-      uploadMsg.css("height", "100px");
-      uploadMsg.css("margin", "auto");
-      uploadMsg.css("padding-top", "29px");
-      uploadMsg.css("width", "200px");
-      uploadMsg.css("font-size", "1.1em");
+      uploadIcon.css("z-index", "10");
+      uploadIcon.css("position", "absolute");
+      uploadIcon.css("top", "50%");
+      uploadIcon.css("left", "50%");
+      uploadIcon.css("transform", "translate(-50%, -50%)");
+      uploadIcon.css("pointer-events", "none");
 
       // Image list CSS
       imagesList.css("display", "inline-block");
 
       // Add icon CSS
       addIcon.css("display", "block");
-      addIcon.css("font-size", "3em");
+      addIcon.css("font-size", "7em");
       addIcon.css("text-align", "center");
-      addIcon.css("margin-top", "3em");
-      addIcon.css("padding-bottom", "20px");
+      addIcon.css("margin-top", "0.6em");
+      addIcon.css("padding-bottom", "12px");
 
+
+      addMsg.css("font-size", "1.7em");
+      addMsg.css("border-top", "1px solid #3AA0FF");
+      addMsg.css("border-bottom", "1px solid #3AA0FF");
+      addMsg.css("padding", "10px");
+
+      button.css("display", "block");
+      button.css("color", "#3AA0FF");
+      button.css("border-color", "#3AA0FF");
+      button.css("border-radius", "1em");
+      button.css("margin", "25px auto");
 
       // Define the function to read a file.
       const readingFile = (file) => {
-
         const fReader = new FileReader();
-
         let container = $("<div></div>");
 
         container.css("width", "100px");
@@ -109,17 +124,13 @@
         container.css("margin-left", "1em");
         container.css("margin-bottom", "1em");
         container.css("float", "left");
-        container.css("border-radius", "1em");
-        container.css("box-shadow", "5px 5px 5px #888888");
-
-
+        container.css("border-radius", "12px");
+        container.css("box-shadow", "0 0 4px 0 #888888");
 
         if (file.type && file.type.search(/image/) != -1) {
-          console.log("Still image");
-
           // Associated function to a ending load
           fReader.onloadend = function (e) {
-            var image = $("<img>");
+            let image = $("<img>");
 
             // Image CSS
             image.css("height", "100px");
@@ -128,37 +139,39 @@
             image.css("top", "50%");
             image.css("transform", "translate(-50%, -50%)");
             image.css("width", "auto");
-            image.css("border", "inset 0px 0px 40px 40px rgba(186, 235, 245, 1)");
 
             // Paste the image source to display the image preview.
             image.attr("src", e.target.result);
             container.append(image);
-            addMsg.hide();
             imagesList.append(container);
 
-            imagesList.find(":nth-child(4n+3)").css("margin-left", "1.7em"); 
-            imagesList.find(":nth-child(4n+6)").css("margin-right", "1.7em");
+            imagesList.find(":nth-child(4n+4)").css("margin-left", "1.9em"); 
+            imagesList.find(":nth-child(4n+7)").css("margin-right", "1.9em");
           };
 
         }
         else if (file.type) {
-          console.log("NOT image");
+
+          let type = "<i class='fa fa-file'></i>";
+
+          if (file.type.search(/audio/) != -1) {
+            type = "<i class='fa fa-file-audio-o'></i>";
+          }
+          else if (file.type.search(/video/) != -1) {
+            type = "<i class='fa fa-file-video-o'></i>"; 
+          }
 
           // Associated function to a ending load
           fReader.onloadend = function (e) {
-            let span = $("<span>" + file.name + "</span>");
+            let span = $("<span>" + type + "</span>");
 
-
-
-            container.css("border", "1px solid black");
-            container.css("font-size", "12px");
+            span.css("font-size", "5em");
 
             container.append(span);
-            addMsg.hide();
             imagesList.append(container);
 
-            imagesList.find(":nth-child(4n+3)").css("margin-left", "1.7em"); 
-            imagesList.find(":nth-child(4n+6)").css("margin-right", "1.7em");
+            imagesList.find(":nth-child(4n+4)").css("margin-left", "1.9em"); 
+            imagesList.find(":nth-child(4n+7)").css("margin-right", "1.9em");
           };
         }
 
@@ -167,8 +180,16 @@
       };
 
       // Manage click event.
-      addIcon.on("click", function onClick(event) {
+      button.on("click", function onClick() {
+        event.stopPropagation();
+        event.preventDefault();
         $(self).click();
+      });
+
+      button.mouseenter(function onMouseEnter() {
+        button.css("background", "#3AA0FF").css("color", "white");
+      }).mouseleave(function onMouseLeave() {
+        button.css("background", "white").css("color", "#3AA0FF");
       });
 
       // Manage events to display an overlay when dragover files.
@@ -177,20 +198,27 @@
         event.preventDefault();
 
         overlay.css("display", "flex");
+        dragbox.css("border-color", "#3AA0FF");
+
+        // Enable back pointer events to capture click, hover...
+        button.css("pointer-events", "none");
+        addMsg.css("pointer-events", "none");
+        addIcon.css("pointer-events", "none");
+        imagesList.css("pointer-events", "none");
       });
-      
+
       dragbox.on("dragexit", function onDragexit(event) {
         event.stopPropagation();
         event.preventDefault();
 
         overlay.css("display", "none");
-      });
+        dragbox.css("border-color", "rgb(210, 210, 210)");
 
-      dragbox.on("dragleave", function onDragleave(event) {
-        event.stopPropagation();
-        event.preventDefault();
-
-        overlay.css("display", "none");
+        // Disable pointer events to avoid miscapture dragexit children's events. 
+        button.css("pointer-events", "initial");
+        addMsg.css("pointer-events", "initial");
+        addIcon.css("pointer-events", "initial");
+        imagesList.css("pointer-events", "initial");
       });
 
       // Manage events when dropping files.
@@ -198,25 +226,32 @@
         event.stopPropagation();
         event.preventDefault();
 
-        addIcon.css("margin-top", "1em");
         overlay.css("display", "none");
+        dragbox.css("border-color", "rgb(210, 210, 210)");
 
-        var files = event.originalEvent.dataTransfer.files;
+        // Enable back pointer events to capture click, hover...
+        button.css("pointer-events", "initial");
+        addMsg.css("pointer-events", "initial");
+        addIcon.css("pointer-events", "initial");
+        imagesList.css("pointer-events", "initial");
+
+        const files = event.originalEvent.dataTransfer.files;
         
-        for(var index = 0; index < files.length; ++index) {
+        for(let index = 0; index < files.length; ++index) {
           readingFile(files[index]);
         }
       });
 
       $(self).on("change", function onChange() {
-        var files = this.files;
+        const files = this.files;
 
-        for(var index = 0; index < files.length; ++index) {
+        for(let index = 0; index < files.length; ++index) {
           readingFile(files[index]);
         }
       });
 
       $(self).hide();
+
       dragbox.insertAfter(this);
 
     });

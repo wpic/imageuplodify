@@ -1,5 +1,5 @@
 {
-  "name": "imageuplodify",
+  "name": "imageuploadify",
   "authors": [
     "juliette.tran@wpic.co <Juliette-Angélique TRAN>",
     "hamed@wpic.co <Hamed Abdollahpour>"
@@ -9,6 +9,7 @@
   "keywords": [
     "jquery",
     "boostrap",
+    "fontawesome",
     "upload",
     "image",
     "drag&drop"
@@ -21,5 +22,10 @@
     "bower_components",
     "test",
     "tests"
-  ]
+  ],
+  "dependencies": {
+        "jquery": "^3.1.0",
+        "bootstrap": "^3.3.7",
+        "fontawesome": "^4.6.3"
+    }
 }
