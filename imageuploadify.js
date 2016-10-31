@@ -43,7 +43,7 @@
         <div class="images-list text-center">
           <i class="fa fa-cloud-upload"></i>
           <span>Drag & Drop Your File(s) Here To Upload</span>
-          <button class="btn btn-default">or select file to upload</button>
+          <button type="button" class="btn btn-default">or select file to upload</button>
         </div>
       </div>
       `);
@@ -180,13 +180,13 @@
       };
 
       // Manage click event.
-      button.on("click", function onClick() {
+      button.on("click", function onClick(event) {
         event.stopPropagation();
         event.preventDefault();
         $(self).click();
       });
 
-      button.mouseenter(function onMouseEnter() {
+      button.mouseenter(function onMouseEnter(event) {
         button.css("background", "#3AA0FF").css("color", "white");
       }).mouseleave(function onMouseLeave() {
         button.css("background", "white").css("color", "#3AA0FF");
