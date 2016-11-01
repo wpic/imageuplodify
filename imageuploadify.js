@@ -31,8 +31,7 @@
     this.each(function() {
       // Save the current element to self to avoid conflict.
       const self = this;
-
-      console.log(self);
+      let totalFiles = [];
 
       // Define the dragbox layout.
       let dragbox = $(`
@@ -61,7 +60,9 @@
       dragbox.css("border", "2px dashed rgb(210, 210, 210)");
       dragbox.css("position", "relative");
       dragbox.css("min-height", "350px");
-      dragbox.css("width", "500px");
+      dragbox.css("min-width", "500px");
+      dragbox.css("max-width", "1000px");
+      dragbox.css("margin", "auto");
       dragbox.css("display", "flex");
       dragbox.css("padding", "0px");
       dragbox.css("flex-direction", "column");
@@ -115,6 +116,7 @@
       // Define the function to read a file.
       const readingFile = (file) => {
         const fReader = new FileReader();
+        fReader.file = file;
         let container = $("<div></div>");
 
         container.css("width", "100px");
@@ -130,6 +132,7 @@
         if (file.type && file.type.search(/image/) != -1) {
           // Associated function to a ending load
           fReader.onloadend = function (e) {
+            var file = this.file;
             let image = $("<img>");
 
             // Image CSS
@@ -239,6 +242,7 @@
         
         for(let index = 0; index < files.length; ++index) {
           readingFile(files[index]);
+          totalFiles.push(files[index]);
         }
       });
 
@@ -247,8 +251,32 @@
 
         for(let index = 0; index < files.length; ++index) {
           readingFile(files[index]);
+          totalFiles.push(files[index]);
         }
       });
+
+
+    $("form").on("submit", function(event) {
+
+      var formData = new FormData();
+      for (var i = 0; i < totalFiles.length; i++) {
+        formData.append("uploads", totalFiles[i]);
+      }
+
+      var xhr = new XMLHttpRequest();
+
+      xhr.open("POST", "http://localhost:9080/images/add", true);
+
+      xhr.onload = function () {
+        if (xhr.status === 200) {
+          console.log('all done: ' + xhr.status);
+        } else {
+          console.log('Something went terribly wrong...');
+        }
+      };
+
+      xhr.send(formData);
+    });
 
       $(self).hide();
 
