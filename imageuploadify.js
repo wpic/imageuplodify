@@ -116,14 +116,19 @@
       // Define the function to read a file.
       const readingFile = (file) => {
         const fReader = new FileReader();
+
+        const width = dragbox.width();
+        const boxesNb = Math.floor((width - 64) / 100) - 1;
+        const marginSize = Math.floor(((width - 64) - (boxesNb * 100)) / (boxesNb - 1));
+
         fReader.file = file;
-        let container = $("<div></div>");
+        let container = $("<div class='containerBox'></div>");
 
         container.css("width", "100px");
         container.css("height", "100px");
         container.css("position", "relative");
         container.css("overflow", "hidden");
-        container.css("margin-left", "1em");
+        container.css("margin-left", marginSize + "px");
         container.css("margin-bottom", "1em");
         container.css("float", "left");
         container.css("border-radius", "12px");
@@ -148,8 +153,8 @@
             container.append(image);
             imagesList.append(container);
 
-            imagesList.find(":nth-child(4n+4)").css("margin-left", "1.9em"); 
-            imagesList.find(":nth-child(4n+7)").css("margin-right", "1.9em");
+            imagesList.find(".containerBox:nth-child(" + boxesNb + "n+4)").css("margin-left", "32px");
+            imagesList.find(".containerBox:nth-child(" + boxesNb + "n+3)").css("margin-right", "32px");
           };
 
         }
@@ -173,8 +178,8 @@
             container.append(span);
             imagesList.append(container);
 
-            imagesList.find(":nth-child(4n+4)").css("margin-left", "1.9em"); 
-            imagesList.find(":nth-child(4n+7)").css("margin-right", "1.9em");
+            imagesList.find(".containerBox:nth-child(" + boxesNb + "n+4)").css("margin-left", "32px");
+            imagesList.find(".containerBox:nth-child(" + boxesNb + "n+3)").css("margin-right", "32px");
           };
         }
 
@@ -246,6 +251,30 @@
         }
       });
 
+      $(window).bind("resize", function(e) {
+        window.resizeEvt;
+        $(window).resize(function () {
+          clearTimeout(window.resizeEvt);
+          window.resizeEvt = setTimeout(function() {
+
+            const width = dragbox.width();
+            const boxesNb = Math.floor((width - 64) / 100) - 1;
+            const marginSize = Math.floor(((width - 64) - (boxesNb * 100)) / (boxesNb - 1));
+
+            let containers = imagesList.children(".containerBox");
+            for (let index = 0; index < containers.length; ++index) {
+              $(containers[index]).css("margin-right", "0px");
+              $(containers[index]).css("margin-left", marginSize + "px");
+            }
+
+            imagesList.find(".containerBox:nth-child(" + boxesNb + "n+4)").css("margin-left", "32px");
+            imagesList.find(".containerBox:nth-child(" + boxesNb + "n+3)").css("margin-right", "32px");
+
+          }, 500);
+        });
+      })
+
+
       $(self).on("change", function onChange() {
         const files = this.files;
 
@@ -255,28 +284,43 @@
         }
       });
 
+      $(self).closest("form").on("submit", function(event) {
+        event.stopPropagation();
+        event.preventDefault();
+        const inputs = this.querySelectorAll("input, textarea, select, button");
+        const formData = new FormData();
 
-    $("form").on("submit", function(event) {
-
-      var formData = new FormData();
-      for (var i = 0; i < totalFiles.length; i++) {
-        formData.append("uploads", totalFiles[i]);
-      }
-
-      var xhr = new XMLHttpRequest();
-
-      xhr.open("POST", "http://localhost:9080/images/add", true);
-
-      xhr.onload = function () {
-        if (xhr.status === 200) {
-          console.log('all done: ' + xhr.status);
-        } else {
-          console.log('Something went terribly wrong...');
+        for (let index = 0; index < inputs.length; ++index) {
+          if (inputs[index].tagName === "SELECT" && inputs[index].hasAttribute("multiple")) {
+            const options = inputs[index].options;
+            for (let i = 0; options.length > i; ++i) {
+              if (options[i].selected) {
+                formData.append(inputs[index].getAttribute("name"), options[i].value);
+              }
+            }
+          }
+          else if (!inputs[index].getAttribute("type") || ((inputs[index].getAttribute("type").toLowerCase()) !== "checkbox" && (inputs[index].getAttribute("type").toLowerCase()) !== "radio") || inputs[index].checked) {
+            formData.append(inputs[index].name, inputs[index].value);
+          }
+          else if ($(inputs[index]).getAttribute("type") != "file") {
+            formData.append(inputs[index].name, inputs[index].value);  
+          }
         }
-      };
 
-      xhr.send(formData);
-    });
+        for (var i = 0; i < totalFiles.length; i++) {
+          formData.append(self.name, totalFiles[i]);
+        }
+
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", $(this).attr("action"), true);
+        xhr.send(formData);
+
+        // TODO: Option
+        setTimeout(function() {
+          location.reload();
+        }, 500);
+        
+      });
 
       $(self).hide();
 
