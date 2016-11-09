@@ -337,9 +337,9 @@
 
       // When submitting the form.
       $(self).closest("form").on("submit", function(event) {
-        // Stop the first submit.
+        // Stop the original submit.
         event.stopPropagation();
-        event.preventDefault();
+        event.preventDefault(event);
         // Retrieve all form inputs.
         const inputs = this.querySelectorAll("input, textarea, select, button");
         // Create a form.
@@ -370,8 +370,19 @@
 
         // Create an request and post all data.
         var xhr = new XMLHttpRequest();
+
+        // When the request has been successfully submitted, redirect to the
+        // location of the form.
+        xhr.onreadystatechange = function(e) {
+          if (xhr.status == 200 && xhr.readyState === XMLHttpRequest.DONE) {
+            window.location.replace(xhr.responseURL);
+          }
+        }
+
         xhr.open("POST", $(this).attr("action"), true);
-        xhr.send(formData);        
+        xhr.send(formData);
+
+        return false;
       });
 
       // Hide the original input.
