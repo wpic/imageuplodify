@@ -21,7 +21,39 @@
     e.preventDefault();
   }, false);
 
+  function compareMimeType(mimeTypes, fileType, formatFile) {
 
+    // If accept is defined as *.
+    if (mimeTypes.length < 2 && mimeTypes[0] === "*") {
+      return true;
+    }
+
+    // Checking all types written in accept.
+    for (let index = 1; index < mimeTypes.length; index+=3) {
+
+      // image/*, audio/*, video/*
+      if (mimeTypes[index + 1] === "*" && fileType.search(new RegExp(mimeTypes[index])) != -1) {
+        console.log("1");
+        return true;
+      }
+      // application/vnd.ms-excel, application/vnd.ms-powerpoint
+      else if (mimeTypes[index + 1] && mimeTypes[index + 1] != "*" && fileType.search(new RegExp("\\*" + mimeTypes[index + 1] + "\\*")) != -1) {
+        console.log("2");
+        return true;
+      }
+      // application/pdf, image/jpg
+      else if (mimeTypes[index + 1] && mimeTypes[index + 1] != "*" && fileType.search(new RegExp(mimeTypes[index + 1])) != -1) {
+        console.log("3");
+        return true;
+      }
+      // .jpg, .pdf .png
+      else if (mimeTypes[index + 1] === "" && (fileType.search(new RegExp(mimeTypes[index])) != -1 || formatFile.search(new RegExp(mimeTypes[index])) != -1)) {
+        console.log("4");
+        return true;
+      }
+    }
+    return false;
+  }
   // Define the plugin imageuploadify.
   $.fn.imageuploadify = function(opts) {
 
@@ -30,8 +62,32 @@
 
     // Initialize every element.
     this.each(function() {
+
       // Save the current element to self to avoid conflict.
       const self = this;
+
+      // Apply on input file having "multiple" attribute only.
+      if (!$(self).attr("multiple")) {
+        return;
+      }
+      // Save accept files
+      let accept = $(self).attr("accept").replace(/\s/g, "").split(",");
+      let result = [];
+
+      accept.forEach((item) => {
+        let regexp;
+        if (item.search(/\//) != -1) {
+          regexp = new RegExp("([A-Za-z-.]*)\/([A-Za-z-*.]*)", "g");
+        }
+        else {
+          regexp = new RegExp("\.([A-Za-z-]*)()", "g");
+        }
+        const r = regexp.exec(item);
+        result = result.concat(r);
+      });
+
+      console.log(result);
+
       // Array containing all files add by dialog box or drag'n drop.
       let totalFiles = [];
       // Count the number of time a "dragenter" enter the box.
@@ -285,12 +341,14 @@
 
         // Retrieve the dragged files.
         const files = event.originalEvent.dataTransfer.files;
-        
+
         // Read all files (to add them to the preview and push them to the files
         // list to submit).
         for(let index = 0; index < files.length; ++index) {
-          readingFile(files[index]);
-          totalFiles.push(files[index]);
+          if (!accept || compareMimeType(result, files[index].type, /(?:\.([^.]+))?$/.exec(files[index].name)[1])) {
+            readingFile(files[index]);
+            totalFiles.push(files[index]);
+          }
         }
       });
 
@@ -330,8 +388,10 @@
         const files = this.files;
 
         for(let index = 0; index < files.length; ++index) {
-          readingFile(files[index]);
-          totalFiles.push(files[index]);
+          if (!accept || compareMimeType(result, files[index].type, /(?:\.([^.]+))?$/.exec(files[index].name)[1])) {
+            readingFile(files[index]);
+            totalFiles.push(files[index]);
+          }
         }
       });
 
@@ -400,7 +460,6 @@
 
   // Default configuraiton of the plugin.
   $.fn.imageuploadify.defaults = {
-
   };
 
 }(jQuery, window, document));
