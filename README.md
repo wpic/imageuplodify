@@ -12,6 +12,15 @@ Dependencies
 * [Bootstrap](http://getbootstrap.com/)
 * [Font Awesome](http://fontawesome.io/)
 
+Features
+========
+
+* Image preview.
+* Responsive (tested with Firefox 49.0.2 and Chrome 54.0).
+* Display file details (on mouse hover).
+* Delete item before uploading (click on the cross).
+* Filter files type according to the attribute "accept".
+
 Usage
 =====
 
@@ -29,3 +38,15 @@ Then use the plugin:
 
 * To change comment, add `placeholder` to input.
 * To support multiple file upload, add `multiple` to input.
+(The drag'n drop box support multiple files no matter if the attribute "multiple" is present or not. To avoid issues, it is better to add it.)
+
+Todo
+====
+
+* Video preview.
+* Test with a more complete form.
+* Auto-submit option.
+* Class custom option.
+* Different preview views option.
+* Support "multiple" attribute.
+* Add a modal box before deleting a file.
