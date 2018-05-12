@@ -380,7 +380,7 @@
           else if (!inputs[index].getAttribute("type") || ((inputs[index].getAttribute("type").toLowerCase()) !== "checkbox" && (inputs[index].getAttribute("type").toLowerCase()) !== "radio") || inputs[index].checked) {
             formData.append(inputs[index].name, inputs[index].value);
           }
-          else if ($(inputs[index]).getAttribute("type") != "file") {
+          else if (inputs[index].getAttribute("type") != "file") {
             formData.append(inputs[index].name, inputs[index].value);  
           }
         }
